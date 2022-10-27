@@ -16,28 +16,41 @@
     "class" : "TalaVisage",
 
     "starOffset": [2, -0.5],
+    // "starOffset": [3, 3],
     "orbitSpeed": 5,
     "maxStars": 6,
 
     "randStarProperties": [
       {
-        "sprite": "items/active/weapons/melee/abilities/spear/talavisage/luz.png",
-        "hitscan": true,
-        "burst": false
+        "sprite": "/items/active/weapons/melee/abilities/spear/talavisage/luz.png",
+        "lightColor": [125, 0, 0],
+        "burstCount": 1,
+        "burstTime": 0,
+        "projectileType": "neomagnumbullet",
+        "projectileParams": {
+          "speed": 200
+        }
       },
       {
-        "sprite": "items/active/weapons/melee/abilities/spear/talavisage/vi.png",
-        "hitscan": false,
-        "burst": true,
+        "sprite": "/items/active/weapons/melee/abilities/spear/talavisage/vi.png",
+        "lightColor": [0, 0, 125],
+        "burstCount": 5,
+        "burstTime": 0,
+        "inaccuracy": 0.1,
         "projectileType": "neomagnumbullet",
-        "projectileParams": {}
+        "projectileParams": {
+          "speed": 200
+        }
       },
       {
-        "sprite": "items/active/weapons/melee/abilities/spear/talavisage/minda.png",
-        "hitscan": false,
-        "burst": true,
+        "sprite": "/items/active/weapons/melee/abilities/spear/talavisage/minda.png",
+        "lightColor": [125, 125, 0],
+        "burstCount": 3,
+        "burstTime": 0.05,
         "projectileType": "neomagnumbullet",
-        "projectileParams": {}
+        "projectileParams": {
+          "speed": 200
+        }
       }
     ],
 
@@ -47,7 +60,7 @@
     },
 
     "baseDamage" : 4,
-    "energyUsage" : 120,
+    "energyUsage" : 10,
     "cooldownTime" : 0.1,
 
     "stances" : {
