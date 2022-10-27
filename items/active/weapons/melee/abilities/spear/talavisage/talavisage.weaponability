@@ -1,0 +1,74 @@
+{
+  "animationParts" : { },
+  "animationCustom" : {
+    "sounds" : {
+      "fireStar" : [ "/sfx/gun/plasma_pistol1.ogg" ]
+    }
+  },
+  "animationScripts" : [
+		"/items/active/weapons/melee/abilities/spear/talavisage/talavisageanimation.lua"
+	],
+
+  "ability" : {
+    "name" : "Tala's Visage",
+    "type" : "talavisage",
+    "scripts" : ["/items/active/weapons/melee/abilities/spear/talavisage/talavisage.lua"],
+    "class" : "TalaVisage",
+
+    "starOffset": [2, -0.5],
+    "orbitSpeed": 5,
+    "maxStars": 6,
+
+    "randStarProperties": [
+      {
+        "sprite": "items/active/weapons/melee/abilities/spear/talavisage/luz.png",
+        "hitscan": true,
+        "burst": false
+      },
+      {
+        "sprite": "items/active/weapons/melee/abilities/spear/talavisage/vi.png",
+        "hitscan": false,
+        "burst": true,
+        "projectileType": "neomagnumbullet",
+        "projectileParams": {}
+      },
+      {
+        "sprite": "items/active/weapons/melee/abilities/spear/talavisage/minda.png",
+        "hitscan": false,
+        "burst": true,
+        "projectileType": "neomagnumbullet",
+        "projectileParams": {}
+      }
+    ],
+
+    "projectileType" : "energyshardplayer",
+    "projectileParameters" : {
+      "baseDamage" : 4
+    },
+
+    "baseDamage" : 4,
+    "energyUsage" : 120,
+    "cooldownTime" : 0.1,
+
+    "stances" : {
+      "windup" : {
+        "duration" : 0.2,
+        "armRotation" : 70,
+        "weaponRotation" : 0,
+        "twoHanded" : true,
+
+        "allowRotate" : false,
+        "allowFlip" : false
+      },
+      "fire" : {
+        "duration" : 0.25,
+        "armRotation" : -45,
+        "weaponRotation" : -55,
+        "twoHanded" : true,
+
+        "allowRotate" : false,
+        "allowFlip" : false
+      }
+    }
+  }
+}

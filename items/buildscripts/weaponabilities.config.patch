@@ -1,0 +1,12 @@
+[
+    {
+        "op": "add",
+        "path": "/talavisage",
+        "value": "/items/active/weapons/melee/abilities/spear/talavisage/talavisage.weaponability"
+    },
+    {
+        "op": "add",
+        "path": "/talacombo",
+        "value": "/items/active/weapons/melee/abilities/spear/talacombo/talacombo.weaponability"
+    }
+]
