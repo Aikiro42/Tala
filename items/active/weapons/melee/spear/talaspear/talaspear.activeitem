@@ -37,7 +37,6 @@
   "primaryAbilityType" : "talacombo",
   "primaryAbility" : {
     "fireTime" : 0.83,
-    "baseDps" : 11.5,
 
     "stances" : {
       "windup1" : {

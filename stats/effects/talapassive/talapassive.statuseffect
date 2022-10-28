@@ -1,0 +1,17 @@
+{
+  "name" : "talapassive",
+  "effectConfig" : {
+    "fallDamageMultiplier": 0,
+    "protectionModifier": 0.25
+  },
+  "defaultDuration" : 0.1,
+
+  "scripts" : [
+    "talapassive.lua"
+  ],
+
+  // "animationConfig" : "project42passive.animation",
+
+  "label" : "No fall damage, but protection is drastically reduced.",
+  "icon" : "talapassive.png"
+}

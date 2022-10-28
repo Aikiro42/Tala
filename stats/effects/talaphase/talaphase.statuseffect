@@ -1,0 +1,16 @@
+{
+  "name" : "talaphase",
+  "blockingStat" : "",
+
+  "effectConfig" : {},
+  "defaultDuration" : 3,
+
+  "scripts" : [
+    "talaphase.lua"
+  ],
+
+  "animationConfig" : "talaphase.animation",
+
+  "label" : "The ethereal blessing has been bestowed upon you",
+  "icon" : "talaphase.png"
+}

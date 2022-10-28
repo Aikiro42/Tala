@@ -1,0 +1,22 @@
+{
+  "projectileName" : "talajavelin",
+  "image" : "talajavelin.png",
+  "animationCycle" : 0.05,
+  "physics" : "laser",
+  "piercing": false,
+  "frameNumber" : 1,
+  "pointLight" : false,
+  "fullbright": true,
+  "speed" : 200,
+  "actionOnReap" : [
+    {
+      "action" : "config",
+      "file" : "/projectiles/talaboom/talaboom.config"
+    }
+  ],
+  "power" : 100.0,
+  "knockback" : 10,
+  "damageKind" : "spear",
+  "emitters" : [ "daggerblue" ],
+  "damagePoly" : [ [-25, -3], [25, -3], [25, 3], [-25, 3] ]
+}

@@ -1,0 +1,13 @@
+{
+  "name" : "taladodge",
+  "blockingStat" : "",
+
+  "effectConfig" : {},
+  "defaultDuration" : 0,
+
+  "scripts" : [
+    "taladodge.lua"
+  ],
+
+  "animationConfig" : "taladodge.animation"
+}

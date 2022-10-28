@@ -4,7 +4,8 @@
     "sounds" : {
       "fireStar" : [ "/sfx/gun/plasma_pistol1.ogg" ],
       "starscream": ["/sfx/tala/starscream.ogg"],
-      "switchstar": ["/sfx/objects/ancientenergy_chord.ogg"]
+      "switchstar": ["/sfx/objects/ancientenergy_chord.ogg"],
+      "saveroll": ["/sfx/cinematics/teleporting_start.ogg"]
     }
   },
   "animationScripts" : [
@@ -27,7 +28,7 @@
 
     "chargeTime": 1,
 
-    "damagePerStar": 500, // damage needed to be dealt to earn one star
+    "hitsPerStar": 5, // damage needed to be dealt to earn one star, divided by half the tier of the weapon
 
     "randStarProperties": [
       {

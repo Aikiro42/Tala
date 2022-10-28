@@ -5,8 +5,6 @@ require "/items/active/weapons/weapon.lua"
 
 TalaVisage = WeaponAbility:new()
 
-local changedStarIndex = true
-local shiftHeldTimer = 0
 local fireHeld = false
 local starListener
 local projectileStack = {}
@@ -14,7 +12,7 @@ local projectileStack = {}
 function TalaVisage:init()
 
   -- sb.logInfo("[TALA] randStarProperties = " .. sb.printJson(self.randStarProperties))
-  self.damageCounter = 0
+  self.hitCounter = 0
   self.cooldownTimer = self.cooldownTime
   self.phase = 0
   self.starIndex = 1
@@ -28,11 +26,11 @@ function TalaVisage:init()
     for _,notification in pairs(notifications) do
       -- sb.logInfo("[TALA] Damage Notif: " .. sb.printJson(notification))
       if notification.sourceEntityId == activeItem.ownerEntityId() and notification.healthLost > 0 then
-        self.damageCounter = self.damageCounter + notification.healthLost
-        if self.damageCounter >= self.damagePerStar then
+        self.hitCounter = self.hitCounter + 1
+        if self.hitCounter >= self.hitsPerStar then
           -- TODO: play sound
           self:addStar()
-          self.damageCounter = 0
+          self.hitCounter = 0
         end
       end
     end
@@ -51,6 +49,7 @@ function TalaVisage:update(dt, fireMode, shiftHeld)
   starListener:update()
   activeItem.setScriptedAnimationParameter("starIndex", self.starIndex)
   activeItem.setScriptedAnimationParameter("starTable", self.starTable)
+  status.addEphemeralEffect("talapassive")
   
   -- update projectile stack
   for i, projectile in ipairs(projectileStack) do
@@ -65,8 +64,8 @@ function TalaVisage:update(dt, fireMode, shiftHeld)
   -- activation logic
 
   -- changing star index
+  --[[
   if shiftHeld then
-    changedStarIndex = false
     shiftHeldTimer = shiftHeldTimer + self.dt
   elseif not changedStarIndex then
     changedStarIndex = true
@@ -77,15 +76,16 @@ function TalaVisage:update(dt, fireMode, shiftHeld)
     end 
     shiftHeldTimer = 0
   end
+  --]]
 
   -- lifesaver
   if status.resourcePercentage("health") <= 0.2 and #self.starTable > 0 then
+    animator.playSound("saveroll")
     status.setResourcePercentage("health", 1)
-    table.remove(self.starTable, self.starIndex)
+    status.addEphemeralEffect("talaphase")
+    self.starTable = {}
     self.starIndex = 1
   end
-
-
 
   if not self.weapon.currentAbility
     and #self.starTable > 0
@@ -93,8 +93,14 @@ function TalaVisage:update(dt, fireMode, shiftHeld)
     and not fireHeld
     and self.cooldownTimer == 0
     and status.consumeResource("energy", status.resourceMax("energy")/self.maxStars) then
-
-      self:setState(self.charge)
+      if not shiftHeld then
+        self:setState(self.charge)
+      else
+        animator.setSoundPitch("switchstar", sb.nrand(0.1, 1))
+        animator.playSound("switchstar")  
+        self.starIndex = (self.starIndex % #self.starTable) + 1
+        fireHeld = true
+      end
 
   elseif self.fireMode ~= "alt" then
     fireHeld = false
@@ -284,7 +290,7 @@ function TalaVisage:orbitRatio()
 end
 
 function TalaVisage:uninit()
-
+  status.removeEphemeralEffect("talapassive")
 end
 
 function TalaVisage:updateStarPos()

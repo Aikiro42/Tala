@@ -1,0 +1,23 @@
+{
+  "particleEmitters" : {
+    "dodgeRight" : {
+      "emissionRate" : 40,
+      "particles" : [
+        {
+          "particle" : "talaafterimage",
+          "flip" : true
+        }
+      ]
+    },
+    "dodgeLeft" : {
+      "emissionRate" : 40,
+      "particles" : [
+        {
+          "particle" : "talaafterimageleft",
+          "flip" : true
+        }
+      ]
+    }
+  },
+  "sounds" : {}
+}

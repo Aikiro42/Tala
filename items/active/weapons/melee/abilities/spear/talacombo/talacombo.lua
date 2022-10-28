@@ -1,5 +1,17 @@
+require "/scripts/interp.lua"
+require "/scripts/vec2.lua"
+require "/scripts/util.lua"
+
 -- Melee primary ability
 TalaCombo = WeaponAbility:new()
+
+local thrown = false
+
+local isShiftHeld = false
+
+local dmgListener
+
+local canDodge
 
 function TalaCombo:init()
   self.comboStep = 1
@@ -13,13 +25,27 @@ function TalaCombo:init()
   self.edgeTriggerTimer = 0
   self.flashTimer = 0
   self.cooldownTimer = self.cooldowns[1]
+  self.shiftHeldTime = -1
+
+  -- dodge
+  self.dodgeCooldownTimer = self.dodgeParams.cooldown
 
   self.animKeyPrefix = self.animKeyPrefix or ""
 
-  isActive = false
+  dmgListener = damageListener("inflictedDamage", function(notifications)
+    for _,notification in pairs(notifications) do
+      if notification.sourceEntityId == activeItem.ownerEntityId() then
+        self:screenShake()
+        if notification.healthLost > 0 then
+          status.giveResource("energy", status.resourceMax("energy") * self.energyStealRate)
+        end
+      end
+    end
+  end)
 
   self.weapon.onLeaveAbility = function()
-    self.weapon:setStance(self.stances.idle)
+    -- self.weapon:setStance(self.stances.idle)
+    thrown = false
   end
 
   self.activeTime = config.getParameter("activeTime", 2)
@@ -31,15 +57,38 @@ end
 -- Ticks on every update regardless if this is the active ability
 function TalaCombo:update(dt, fireMode, shiftHeld)
   WeaponAbility.update(self, dt, fireMode, shiftHeld)
+  dmgListener:update()
 
-  if animator.animationState("blade") == "inactive" then
+  -- flags
+  isShiftHeld = shiftHeld
+  canDodge = self.shiftHeldTime >= 0 and (self.shiftHeldTime < self.dodgeParams.triggerTime or self.dodgeParams.triggerTime <= 0) and self.dodgeCooldownTimer == 0 and not shiftHeld
+
+  self.dodgeCooldownTimer = math.max(0, self.dodgeCooldownTimer - self.dt)
+
+  -- activation logic
+
+  -- controls whether you're holding the item or not
+  if animator.animationState("blade") == "inactive" and not thrown then
     activeItem.setHoldingItem(false)
   else
     activeItem.setHoldingItem(true)
   end
 
+  -- dodging
+  if shiftHeld then
+    if self.shiftHeldTime < 0 then
+      self.shiftHeldTime = 0
+    end
+    self.shiftHeldTime = self.shiftHeldTime + self.dt
+  elseif canDodge and not self.weapon.currentAbility then
+      self:setState(self.dodge)
+  else
+    self.shiftHeldTime = -1
+  end
+
+  -- controls the presence of the weapon
   if self.activeTimer > 0 then
-    if animator.animationState("blade") == "inactive" then
+    if animator.animationState("blade") == "inactive" and not thrown then
       animator.setAnimationState("blade", "extend")
     end
     if not self.weapon.currentAbility then
@@ -51,6 +100,7 @@ function TalaCombo:update(dt, fireMode, shiftHeld)
     end
   end
 
+  -- ready indicator
   if self.cooldownTimer > 0 then
     self.cooldownTimer = math.max(0, self.cooldownTimer - self.dt)
     if self.cooldownTimer == 0 then
@@ -58,6 +108,7 @@ function TalaCombo:update(dt, fireMode, shiftHeld)
     end
   end
 
+  -- ready indicator
   if self.flashTimer > 0 then
     self.flashTimer = math.max(0, self.flashTimer - self.dt)
     if self.flashTimer == 0 then
@@ -65,16 +116,97 @@ function TalaCombo:update(dt, fireMode, shiftHeld)
     end
   end
 
+  -- edge trigger
   self.edgeTriggerTimer = math.max(0, self.edgeTriggerTimer - dt)
   if self.lastFireMode ~= (self.activatingFireMode or self.abilitySlot) and fireMode == (self.activatingFireMode or self.abilitySlot) then
     self.edgeTriggerTimer = self.edgeTriggerGrace
   end
   self.lastFireMode = fireMode
 
+  -- actual activation
   if not self.weapon.currentAbility and self:shouldActivate() then
       self.activeTimer = self.activeTime
-      self:setState(self.windup)
+      if shiftHeld and status.resourcePercentage("energy") == 1then
+        self:setState(self.javelinCharge)
+      else
+        self:setState(self.windup)
+      end
   end
+end
+
+function TalaCombo:dodge()
+
+  self:demanifest()
+  
+  local dodgeDirection
+  if mcontroller.xVelocity() ~= 0 then
+    dodgeDirection = mcontroller.movingDirection()
+  else
+    dodgeDirection = mcontroller.facingDirection()
+  end
+  animator.playSound("dodge")
+  status.addEphemeralEffect("taladodge", self.dodgeParams.time)
+  util.wait(self.dodgeParams.time, function(dt)
+    mcontroller.setVelocity({self.dodgeParams.speed*dodgeDirection, 0})
+  end)
+  mcontroller.setXVelocity(mcontroller.xVelocity() * self.dodgeParams.endXVelMult)
+
+  self.dodgeCooldownTimer = self.dodgeParams.cooldown
+
+end
+
+function TalaCombo:javelinCharge()
+  -- lerp
+  -- self.weapon:setStance(self.stances.javelinCharge)
+  status.setResourcePercentage("energy", 0)
+  local chargeTimer = 0
+  local maxChargeTime = self.stances.javelinCharge.duration
+  while self.fireMode == self.activatingFireMode or self.abilitySlot do
+    local chargeProgress = chargeTimer / maxChargeTime
+    self.weapon:updateAim()
+
+    self.weapon.relativeWeaponRotation = util.toRadians(interp.sin(chargeProgress, math.deg(self.weapon.relativeWeaponRotation), self.stances.javelinCharge.weaponRotation))
+    self.weapon.relativeArmRotation = util.toRadians(interp.sin(chargeProgress, math.deg(self.weapon.relativeArmRotation), self.stances.javelinCharge.armRotation))
+
+    chargeTimer = chargeTimer + self.dt
+    if chargeTimer >= maxChargeTime then self:setState(self.javelinFire) end
+    coroutine.yield()
+  end
+
+
+end
+
+function TalaCombo:javelinFire()
+
+  thrown = true
+
+  local projOrigin = vec2.add(mcontroller.position(), activeItem.handPosition())
+
+  self.weapon:setStance(self.stances.javelinFire)
+  self.weapon:updateAim()
+  animator.setAnimationState("blade", "inactive")
+  
+  local javelinProjectile = world.spawnProjectile(
+    "talajavelin",
+    projOrigin,
+    activeItem.ownerEntityId(),
+    world.distance(activeItem.ownerAimPosition(), projOrigin),
+    false,
+    {
+      power = status.resourceMax("energy"),
+      damageType = "IgnoresDef",
+    }
+  )
+
+  util.wait(self.stances.javelinFire.duration)
+  self.weapon:setStance(self.stances.idle)
+  self.activeTimer = 0
+  self.comboStep = 1
+  
+end
+
+function TalaCombo:getJavelinDamage()
+  return status.resourceMax("energy") * activeItem.ownerPowerMultiplier() * config.getParameter("level", 1) * config.getParameter("damageLevelMultiplier", 1)
 end
 
 
@@ -103,24 +235,6 @@ function TalaCombo:windup()
   else
     self:setState(self.fire)
   end
-end
-
--- State: wait
--- waiting for next combo input
-function TalaCombo:wait()
-  local stance = self.stances["wait"..(self.comboStep - 1)]
-
-  self.weapon:setStance(stance)
-
-  util.wait(stance.duration, function()
-    if self:shouldActivate() then
-      self:setState(self.windup)
-      return
-    end
-  end)
-
-  self.cooldownTimer = math.max(0, self.cooldowns[self.comboStep - 1] - stance.duration)
-  self.comboStep = 1
 end
 
 -- State: preslash
@@ -154,15 +268,48 @@ function TalaCombo:fire()
   util.wait(stance.duration, function()
     local damageArea = partDamageArea("swoosh")
     self.weapon:setDamage(self.stepDamageConfig[self.comboStep], damageArea)
+    -- mcontroller.controlApproachVelocity(vec2.mul(vec2.norm(world.distance(activeItem.ownerAimPosition(), mcontroller.position())), 10), 1000)
   end)
 
-  if self.comboStep < self.comboSteps then
-    self.comboStep = self.comboStep + 1
-    self:setState(self.wait)
-  else
-    self.cooldownTimer = self.cooldowns[self.comboStep]
-    self.comboStep = 1
-  end
+  self:setState(self.wait)
+end
+
+function TalaCombo:demanifest()
+  self.activeTimer = 0
+  self.comboStep = 1
+end
+
+
+-- State: wait
+-- waiting for next combo input
+function TalaCombo:wait()
+  local stance = self.stances["wait"..(self.comboStep)]
+  stance.allowFlip = true
+  self.weapon:setStance(stance)
+
+  util.wait(stance.duration, function()
+
+    -- interrupts combo to use alt ability
+    if self.fireMode == "alt" then
+      self:setState(self.demanifest)
+      return
+    end
+
+    if canDodge then self:setState(self.dodge) return end
+
+    if self:shouldActivate() then
+      if not isShiftHeld then
+        self.comboStep = (self.comboStep % self.comboSteps) + 1
+        self:setState(self.windup)
+      else
+        self:setState(self.javelinCharge)
+      end
+      return
+    end
+  end)
+
+  self.cooldownTimer = math.max(0, self.cooldowns[self.comboStep] - stance.duration)
+  self.comboStep = 1
 end
 
 function TalaCombo:shouldActivate()
@@ -193,13 +340,16 @@ function TalaCombo:computeDamageAndCooldowns()
   self.cooldowns = {}
   local totalAttackTime = 0
   local totalDamageFactor = 0
+  self.javelinDamage = 0
   for i, attackTime in ipairs(attackTimes) do
     self.stepDamageConfig[i] = util.mergeTable(copy(self.damageConfig), self.stepDamageConfig[i])
     self.stepDamageConfig[i].timeoutGroup = "primary"..i
 
     local damageFactor = self.stepDamageConfig[i].baseDamageFactor
     self.stepDamageConfig[i].baseDamage = damageFactor * self.baseDps * self.fireTime
-
+    if self.stepDamageConfig[i].baseDamage > self.javelinDamage then
+      self.javelinDamage = self.stepDamageConfig[i].baseDamage
+    end
     totalAttackTime = totalAttackTime + attackTime
     totalDamageFactor = totalDamageFactor + damageFactor
 
@@ -211,4 +361,21 @@ end
 
 function TalaCombo:uninit()
   self.weapon:setDamage()
+end
+
+function TalaCombo:screenShake(amount, shakeTime)
+  local amount = amount or 0.5
+  local cam = world.spawnProjectile(
+    "invisibleprojectile",
+    vec2.add(mcontroller.position(), {sb.nrand(amount), sb.nrand(amount)}),
+    0,
+    {0, 0},
+    false,
+    {
+      power = 0,
+      timeToLive = shakeTime or 0.01,
+      damageType = "NoDamage"
+    }
+  )
+  activeItem.setCameraFocusEntity(cam)
 end
