@@ -20,13 +20,14 @@
     "orbitSpeed": 5,
     "maxStars": 6,
 
+    "damagePerStar": 500,
     "randStarProperties": [
       {
         "sprite": "/items/active/weapons/melee/abilities/spear/talavisage/luz.png",
         "lightColor": [125, 0, 0],
         "burstCount": 1,
         "burstTime": 0,
-        "projectileType": "neomagnumbullet",
+        "projectileType": "hitscan",
         "projectileParams": {
           "speed": 200
         }
@@ -37,7 +38,7 @@
         "burstCount": 5,
         "burstTime": 0,
         "inaccuracy": 0.1,
-        "projectileType": "neomagnumbullet",
+        "projectileType": "hitscan",
         "projectileParams": {
           "speed": 200
         }
@@ -46,8 +47,8 @@
         "sprite": "/items/active/weapons/melee/abilities/spear/talavisage/minda.png",
         "lightColor": [125, 125, 0],
         "burstCount": 3,
-        "burstTime": 0.05,
-        "projectileType": "neomagnumbullet",
+        "burstTime": 0.1,
+        "projectileType": "hitscan",
         "projectileParams": {
           "speed": 200
         }

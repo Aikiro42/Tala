@@ -9,11 +9,12 @@ local changedStarIndex = true
 local shiftHeldTimer = 0
 local fireHeld = false
 local starListener
+local projectileStack = {}
 
 function TalaVisage:init()
 
-  sb.logInfo("[TALA] randStarProperties = " .. sb.printJson(self.randStarProperties))
-
+  -- sb.logInfo("[TALA] randStarProperties = " .. sb.printJson(self.randStarProperties))
+  self.damageCounter = 0
   self.cooldownTimer = self.cooldownTime
   self.phase = 0
   self.starIndex = 1
@@ -24,10 +25,15 @@ function TalaVisage:init()
   activeItem.setScriptedAnimationParameter("starIndex", self.starIndex)
   starListener = damageListener("inflictedDamage", function(notifications)
     for _,notification in pairs(notifications) do
-      sb.logInfo("[TALA] Damage Notif: " .. sb.printJson(notification))
+      -- sb.logInfo("[TALA] Damage Notif: " .. sb.printJson(notification))
       if notification.sourceEntityId == activeItem.ownerEntityId() then
         if notification.healthLost > 0 then
-          self:addStar()
+          self.damageCounter = self.damageCounter + notification.healthLost
+          if self.damageCounter >= self.damagePerStar then
+            -- TODO: play sound
+            self:addStar()
+            self.damageCounter = 0
+          end
         end
       end
     end
@@ -47,6 +53,16 @@ function TalaVisage:update(dt, fireMode, shiftHeld)
   starListener:update()
   activeItem.setScriptedAnimationParameter("starIndex", self.starIndex)
   activeItem.setScriptedAnimationParameter("starTable", self.starTable)
+  
+  -- update projectile stack
+  for i, projectile in ipairs(projectileStack) do
+    projectileStack[i].lifetime = projectileStack[i].lifetime - dt
+    projectileStack[i].origin = vec2.lerp((1 - projectileStack[i].lifetime/projectileStack[i].maxLifetime)*0.01, projectileStack[i].origin, projectileStack[i].destination)
+    if projectileStack[i].lifetime <= 0 then
+      table.remove(projectileStack, i)
+    end
+  end
+  activeItem.setScriptedAnimationParameter("projectileStack", projectileStack)
 
   -- activation
   if shiftHeld then
@@ -87,7 +103,7 @@ function TalaVisage:fire()
   if self.starTable[self.starIndex].projectileType ~= "hitscan" then
     self:fireProjectiles()
   else
-    -- hitscan
+    self:fireHitscan()
   end
 
   -- remove star from startable
@@ -99,7 +115,7 @@ function TalaVisage:fire()
 end
 
 function TalaVisage:fireProjectiles()
-  sb.logInfo("[TALA] " .. sb.printJson(self.starTable))
+  -- sb.logInfo("[TALA] " .. sb.printJson(self.starTable))
   local shots = self.starTable[self.starIndex].burstCount
   local soundPlayed = false
   while shots > 0 do
@@ -129,6 +145,79 @@ function TalaVisage:fireProjectiles()
     if shots > 0 then util.wait(self.starTable[self.starIndex].burstTime) end
 
   end
+end
+
+-- hitscan shots are non-penetrating
+function TalaVisage:fireHitscan()
+  local shots = self.starTable[self.starIndex].burstCount
+  local soundPlayed = false
+  while shots > 0 do
+    
+    shots = shots - 1
+
+    local hitreg = self:hitscan(self.starTable[self.starIndex].inaccuracy)
+    if hitreg[3] then
+      -- TODO: make custom status effect for tala
+      world.sendEntityMessage(hitreg[3], "applyStatusEffect", "talahitscandamage", (self.starTable[self.starIndex].projectileParams.power or 42) * activeItem.ownerPowerMultiplier(), entity.id())
+    end
+
+    local life = 0.3
+    table.insert(projectileStack, {
+      width = 2,
+      origin = hitreg[1],
+      destination = hitreg[2],
+      lifetime = life,
+      maxLifetime = life,
+      hitscanColor = self.starTable[self.starIndex].lightColor
+    })
+
+    -- effects
+    if not soundPlayed then
+      animator.playSound("fireStar")
+    end
+
+    if self.starTable[self.starIndex].burstTime == 0 then
+      soundPlayed = true
+    end
+
+    self:screenShake(0.05, 0.01)
+
+    if shots > 0 then util.wait(self.starTable[self.starIndex].burstTime) end
+
+  end
+
+end
+
+function TalaVisage:hitscan(inaccuracy)
+  local scanOrig = self:firePosition()
+  local scanDest = vec2.add(scanOrig, vec2.mul(vec2.norm(self:aimVector(inaccuracy or 0)), self.range or 100))
+  scanDest = world.lineCollision(scanOrig, scanDest, {"Block", "Dynamic"}) or scanDest
+
+  local hitId = world.entityLineQuery(scanOrig, scanDest, {
+    withoutEntityId = entity.id(),
+    includedTypes = {"monster", "npc", "player"},
+    order = "nearest"
+  })
+  local id = null
+  if #hitId > 0 then
+    if world.entityCanDamage(entity.id(), hitId[1]) then
+
+      local aimAngle = vec2.angle(world.distance(scanDest, scanOrig))
+      local entityAngle = vec2.angle(world.distance(world.entityPosition(hitId[1]), scanOrig))
+      local rotation = aimAngle - entityAngle
+      
+      scanDest = vec2.rotate(world.distance(world.entityPosition(hitId[1]), scanOrig), rotation)
+      scanDest = vec2.add(scanDest, scanOrig)
+
+      id = hitId[1]
+
+    end
+  end
+
+  world.debugLine(scanOrig, scanDest, {255,0,255})
+
+  return {scanOrig, scanDest, id}
+
 end
 
 
@@ -203,5 +292,5 @@ function TalaVisage:addStar()
     zindex = "-1"
   }
   self.starTable[new] = util.mergeTable(copy(self.randStarProperties[type]), toMerge)
-  sb.logInfo("[TALA] " .. sb.printJson(self.starTable))
+  -- sb.logInfo("[TALA] " .. sb.printJson(self.starTable))
 end

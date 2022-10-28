@@ -1,0 +1,7 @@
+{
+  "name" : "talahitscandamage",
+  "defaultDuration" : 0,
+  "scripts" : [
+    "talahitscandamage.lua"
+  ]
+}
