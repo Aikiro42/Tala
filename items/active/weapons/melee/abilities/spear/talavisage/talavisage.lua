@@ -21,24 +21,22 @@ function TalaVisage:init()
   self.starPos = {{0, 0, ""}, {0, 0, ""}, {0, 0, ""}}
   self.starTable = {}
   self.switchGracePeriod = 0.2
+  self.orbitSpeed = self.minOrbitSpeed
   self:updateStarPos()
   activeItem.setScriptedAnimationParameter("starIndex", self.starIndex)
   starListener = damageListener("inflictedDamage", function(notifications)
     for _,notification in pairs(notifications) do
       -- sb.logInfo("[TALA] Damage Notif: " .. sb.printJson(notification))
-      if notification.sourceEntityId == activeItem.ownerEntityId() then
-        if notification.healthLost > 0 then
-          self.damageCounter = self.damageCounter + notification.healthLost
-          if self.damageCounter >= self.damagePerStar then
-            -- TODO: play sound
-            self:addStar()
-            self.damageCounter = 0
-          end
+      if notification.sourceEntityId == activeItem.ownerEntityId() and notification.healthLost > 0 then
+        self.damageCounter = self.damageCounter + notification.healthLost
+        if self.damageCounter >= self.damagePerStar then
+          -- TODO: play sound
+          self:addStar()
+          self.damageCounter = 0
         end
       end
     end
   end)
-
 end
 
 function TalaVisage:update(dt, fireMode, shiftHeld)
@@ -64,16 +62,27 @@ function TalaVisage:update(dt, fireMode, shiftHeld)
   end
   activeItem.setScriptedAnimationParameter("projectileStack", projectileStack)
 
-  -- activation
+  -- activation logic
+
+  -- changing star index
   if shiftHeld then
     changedStarIndex = false
     shiftHeldTimer = shiftHeldTimer + self.dt
   elseif not changedStarIndex then
     changedStarIndex = true
     if shiftHeldTimer <= self.switchGracePeriod and #self.starTable > 0 then
+      animator.setSoundPitch("switchstar", sb.nrand(0.1, 1))
+      animator.playSound("switchstar")
       self.starIndex = (self.starIndex % #self.starTable) + 1
     end 
     shiftHeldTimer = 0
+  end
+
+  -- lifesaver
+  if status.resourcePercentage("health") <= 0.2 and #self.starTable > 0 then
+    status.setResourcePercentage("health", 1)
+    table.remove(self.starTable, self.starIndex)
+    self.starIndex = 1
   end
 
 
@@ -83,18 +92,37 @@ function TalaVisage:update(dt, fireMode, shiftHeld)
     and self.fireMode == "alt"
     and not fireHeld
     and self.cooldownTimer == 0
-    and status.overConsumeResource("energy", self.energyUsage) then
+    and status.consumeResource("energy", status.resourceMax("energy")/self.maxStars) then
 
-    self:setState(self.fire)
+      self:setState(self.charge)
+
   elseif self.fireMode ~= "alt" then
     fireHeld = false
   end
 end
 
+function TalaVisage:charge()
+  local chargeTimer = 0
+  animator.setSoundVolume("starscream", 0)
+  animator.setSoundPitch("starscream", 1)
+  animator.playSound("starscream", -1)
+  while self.fireMode == "alt" do
+    chargeTimer = math.min(self.chargeTime, chargeTimer + self.dt)
+    self.orbitSpeed = math.min(self.maxOrbitSpeed, self.orbitSpeed + self.orbitAccel * self.dt)
+    animator.setSoundVolume("starscream", self:orbitRatio())
+    animator.setSoundPitch("starscream", 1 + self:orbitRatio())
+    coroutine.yield()
+  end
+  animator.stopAllSounds("starscream")
+  animator.setSoundVolume("starscream", 0)
+  animator.setSoundPitch("starscream", 1)
+
+  self:setState(self.fire)
+end
+
 function TalaVisage:fire()
 
   fireHeld = true
-
 
   -- hide the sprite
   self.starTable[self.starIndex].sprite = "/assetmissing.png"
@@ -110,13 +138,17 @@ function TalaVisage:fire()
   table.remove(self.starTable, self.starIndex)
 
   self.starIndex = 1
+  self.orbitSpeed = self.minOrbitSpeed
 
   self.cooldownTimer = self.cooldownTime
+
 end
 
 function TalaVisage:fireProjectiles()
   -- sb.logInfo("[TALA] " .. sb.printJson(self.starTable))
   local shots = self.starTable[self.starIndex].burstCount
+  local params = copy(self.starTable[self.starIndex].projectileParams)
+  params.power = self:damageAmount()
   local soundPlayed = false
   while shots > 0 do
 
@@ -128,7 +160,7 @@ function TalaVisage:fireProjectiles()
       activeItem.ownerEntityId(),
       self:aimVector(self.starTable[self.starIndex].inaccuracy),
       false,
-      self.starTable[self.starIndex].projectileParams
+      params
     )
       
     -- effects
@@ -158,7 +190,7 @@ function TalaVisage:fireHitscan()
     local hitreg = self:hitscan(self.starTable[self.starIndex].inaccuracy)
     if hitreg[3] then
       -- TODO: make custom status effect for tala
-      world.sendEntityMessage(hitreg[3], "applyStatusEffect", "talahitscandamage", (self.starTable[self.starIndex].projectileParams.power or 42) * activeItem.ownerPowerMultiplier(), entity.id())
+      world.sendEntityMessage(hitreg[3], "applyStatusEffect", "talahitscandamage", self:damageAmount(), entity.id())
     end
 
     local life = 0.3
@@ -232,12 +264,27 @@ function TalaVisage:aimVector(inaccuracy)
   return aimVector
 end
 
+--[[
+
+Damage is calculated depending on:
+1. amount of Ancient Essence the wielder has divided by 10000. Holding over 100,000 AE won't give additional damage.
+2. weapon tier
+3. how close the stars are to max orbit speed times the number of stars accumulated
+4. the owner's ATK stat
+
+All factors are multiplicative to each other.
+
+--]]
 function TalaVisage:damageAmount()
-  return self.baseDamage * config.getParameter("damageLevelMultiplier")
+  return math.min(10, ((world.entityCurrency(activeItem.ownerEntityId(), "essence") or 1)/10000)) * config.getParameter("damageLevelMultiplier") * (1 + self:orbitRatio() * #self.starTable) * activeItem.ownerPowerMultiplier()
+end
+
+function TalaVisage:orbitRatio()
+  return (self.orbitSpeed - self.minOrbitSpeed)/self.maxOrbitSpeed
 end
 
 function TalaVisage:uninit()
-  status.clearPersistentEffects("weaponMovementAbility")
+
 end
 
 function TalaVisage:updateStarPos()

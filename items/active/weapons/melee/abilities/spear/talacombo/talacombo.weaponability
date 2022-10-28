@@ -222,6 +222,7 @@
 
     "damageConfig" : {
       "damageSourceKind" : "broadsword",
+      "damageType": "IgnoresDef",
       "statusEffects" : [ ],
       "knockbackMode" : "facing",
       "timeout" : 0.5

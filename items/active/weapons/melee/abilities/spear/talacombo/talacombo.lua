@@ -16,14 +16,40 @@ function TalaCombo:init()
 
   self.animKeyPrefix = self.animKeyPrefix or ""
 
+  isActive = false
+
   self.weapon.onLeaveAbility = function()
     self.weapon:setStance(self.stances.idle)
   end
+
+  self.activeTime = config.getParameter("activeTime", 2)
+  self.activeTimer = 0
+  animator.setAnimationState("blade", "inactive")
+
 end
 
 -- Ticks on every update regardless if this is the active ability
 function TalaCombo:update(dt, fireMode, shiftHeld)
   WeaponAbility.update(self, dt, fireMode, shiftHeld)
+
+  if animator.animationState("blade") == "inactive" then
+    activeItem.setHoldingItem(false)
+  else
+    activeItem.setHoldingItem(true)
+  end
+
+  if self.activeTimer > 0 then
+    if animator.animationState("blade") == "inactive" then
+      animator.setAnimationState("blade", "extend")
+    end
+    if not self.weapon.currentAbility then
+      self.activeTimer = math.max(0, self.activeTimer - self.dt)
+    end
+  elseif self.activeTimer == 0 then
+    if animator.animationState("blade") == "active" then
+      animator.setAnimationState("blade", "retract")
+    end
+  end
 
   if self.cooldownTimer > 0 then
     self.cooldownTimer = math.max(0, self.cooldownTimer - self.dt)
@@ -46,9 +72,11 @@ function TalaCombo:update(dt, fireMode, shiftHeld)
   self.lastFireMode = fireMode
 
   if not self.weapon.currentAbility and self:shouldActivate() then
-    self:setState(self.windup)
+      self.activeTimer = self.activeTime
+      self:setState(self.windup)
   end
 end
+
 
 -- State: windup
 function TalaCombo:windup()

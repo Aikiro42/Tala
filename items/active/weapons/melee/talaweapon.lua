@@ -22,21 +22,9 @@ function init()
 
   self.weapon:init()
 
-  self.activeTime = config.getParameter("activeTime", 2.0)
-  self.activeTimer = 0
-  animator.setAnimationState("blade", "inactive")
-
 end
 
 function update(dt, fireMode, shiftHeld)
-
-
-  if animator.animationState("blade") == "inactive" then
-    activeItem.setHoldingItem(false)
-  else
-    activeItem.setHoldingItem(true)
-  end
-
 
   self.weapon:update(dt, fireMode, shiftHeld)
 
@@ -44,7 +32,7 @@ function update(dt, fireMode, shiftHeld)
     speedModifier = 1.5,
     airJumpModifier = 1.5
   })
-
+  --[[
   local nowActive = self.weapon.currentAbility ~= nil
   if nowActive then
     if self.activeTimer == 0 then
@@ -58,6 +46,7 @@ function update(dt, fireMode, shiftHeld)
       animator.setAnimationState("blade", "retract")
     end
   end
+  --]]
 end
 
 function uninit()
