@@ -5,7 +5,8 @@
       "fireStar" : [ "/sfx/gun/plasma_pistol1.ogg" ],
       "starscream": ["/sfx/tala/starscream.ogg"],
       "switchstar": ["/sfx/objects/ancientenergy_chord.ogg"],
-      "saveroll": ["/sfx/cinematics/teleporting_start.ogg"]
+      "saveroll": ["/sfx/cinematics/teleporting_start.ogg"],
+      "earnstar": ["/sfx/gun/gnomebeam_hit3.ogg"]
     }
   },
   "animationScripts" : [

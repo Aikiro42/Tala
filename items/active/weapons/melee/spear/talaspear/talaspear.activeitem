@@ -7,9 +7,9 @@
   "description" : "A manifestation of the Star Goddess's power in the form of a spear composed of concentrated Essence.",
   "shortdescription" : "^#FF88FF;Tala's Spear",
   "tooltipKind" : "base",
-  "category" : "broadsword",
+  "category" : "spear",
   "twoHanded" : true,
-  "itemTags" : ["weapon", "melee", "broadsword"],
+  "itemTags" : ["weapon", "melee", "spear"],
 
   "inventoryIcon" : "talaspearicon.png",
 

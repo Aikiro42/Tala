@@ -345,5 +345,8 @@ function TalaVisage:addStar()
     zindex = "-1"
   }
   self.starTable[new] = util.mergeTable(copy(self.randStarProperties[type]), toMerge)
+
+  animator.setSoundPitch("earnstar", sb.nrand(0.1, 1.1))
+  animator.playSound("earnstar")
   -- sb.logInfo("[TALA] " .. sb.printJson(self.starTable))
 end
