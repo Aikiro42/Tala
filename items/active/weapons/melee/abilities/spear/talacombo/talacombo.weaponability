@@ -257,7 +257,7 @@
       {
           "damageSourceKind" : "shortsword",
           "baseDamageFactor": 0.9,
-          "knockback": 15
+          "knockback": 5
       },
       {
           "damageSourceKind" : "spear",
@@ -267,7 +267,7 @@
       {
           "damageSourceKind" : "spear",
           "baseDamageFactor": 1.2,
-          "knockback": 20
+          "knockback": 5
       },
       {
         "damageSourceKind" : "spear",

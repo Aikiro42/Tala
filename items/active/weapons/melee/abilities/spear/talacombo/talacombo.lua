@@ -35,7 +35,7 @@ function TalaCombo:init()
   dmgListener = damageListener("inflictedDamage", function(notifications)
     for _,notification in pairs(notifications) do
       if notification.sourceEntityId == activeItem.ownerEntityId() then
-        self:screenShake()
+        self:screenShake(1)
         if notification.healthLost > 0 then
           status.giveResource("energy", status.resourceMax("energy") * self.energyStealRate)
         end

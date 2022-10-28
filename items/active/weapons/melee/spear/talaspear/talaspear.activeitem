@@ -4,14 +4,14 @@
   "level" : 10,
   "maxStack" : 1,
   "rarity" : "Legendary",
-  "description" : "This hardened violium hilt houses the projector for a wicked energy blade.",
-  "shortdescription" : "talaspear",
-  "tooltipKind" : "sword",
+  "description" : "A manifestation of the Star Goddess's power in the form of a spear composed of concentrated Essence.",
+  "shortdescription" : "^#FF88FF;Tala's Spear",
+  "tooltipKind" : "base",
   "category" : "broadsword",
   "twoHanded" : true,
   "itemTags" : ["weapon", "melee", "broadsword"],
 
-  "inventoryIcon" : "violiumbroadswordicon.png",
+  "inventoryIcon" : "talaspearicon.png",
 
   "animation" : "/items/active/weapons/melee/spear/talaspear/talaspear.animation",
 

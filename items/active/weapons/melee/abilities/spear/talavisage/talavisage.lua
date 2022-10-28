@@ -178,7 +178,7 @@ function TalaVisage:fireProjectiles()
       soundPlayed = true
     end
 
-    self:screenShake(0.05, 0.01)
+    self:screenShake(0.2, 0.01)
 
     if shots > 0 then util.wait(self.starTable[self.starIndex].burstTime) end
 
@@ -218,7 +218,7 @@ function TalaVisage:fireHitscan()
       soundPlayed = true
     end
 
-    self:screenShake(0.05, 0.01)
+    self:screenShake(0.2, 0.01)
 
     if shots > 0 then util.wait(self.starTable[self.starIndex].burstTime) end
 

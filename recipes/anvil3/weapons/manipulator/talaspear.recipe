@@ -1,0 +1,8 @@
+{
+    "input": [
+        {"item": "essence", "count": 100000}
+    ],
+    "output": {"item": "talaspear", "count": 1},
+    "groups" : [ "craftingmanipulator", "weapons", "all" ]
+
+}
