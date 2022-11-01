@@ -1,0 +1,5 @@
+{
+  "sounds": {
+    "consume" : [ "/sfx/objects/essencechest_open2.ogg" ]
+  }
+}

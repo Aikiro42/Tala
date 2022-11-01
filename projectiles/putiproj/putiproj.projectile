@@ -1,41 +1,33 @@
 {
-  "projectileName" : "talajavelin",
-  "image" : "talajavelin.png",
+  "projectileName" : "putiproj",
+  "image" : "putiproj.png",
   "actionOnReap" : [
     {
       "action" : "config",
-      "file" : "/projectiles/talaboom/talaboom.config"
+      "file" : "/projectiles/putiboom/putiboom.config"
     }
   ],
   "damagePoly" : [
-    [27.0, 0.5],
-    [20.0, 2.5],
-    [2.0, 2.5],
-    [-3.0, 5.5],
-    [-6.0, 5.5],
-    [-4.0, 3.5],
-    [-7.0, 0.5],
-    [-4.0, -2.5],
-    [-6.0, -4.5],
-    [-3.0, -4.5],
-    [2.0, -1.5],
-    [20.0, -1.5]
+    [5.5, 5.5],
+    [-5.5, 5.5],
+    [-5.5, -5.5],
+    [5.5, -5.5]
   ],
   "pointLight" : true,
-  "lightColor": [125,0,100],
+  "lightColor": [125,125,125],
   "fullbright": true,
 
-  "physics" : "laser",
+  "physics" : "grenade",
   "power" : 100.0,
   "animationCycle" : 0.05,
-  "frameNumber" : 1,
-  "speed" : 150,
+  "frameNumber" : 2,
+  "speed" : 75,
   "animationLoops" : true,
 
   "piercing": false,
   "bounces" : 0,
   "flippable" : true,
-  "damageKind" : "spear",
+  "damageKind" : "default",
   "damageType": "IgnoresDef",
   "emitters" : [ "daggerblue" ],
   "statusEffects" : [],

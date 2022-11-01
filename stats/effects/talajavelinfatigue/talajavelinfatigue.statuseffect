@@ -1,0 +1,13 @@
+{
+  "name" : "talajavelinfatigue",
+  "effectConfig" : {
+  },
+  "defaultDuration" : 5,
+
+  "scripts" : [
+    "talajavelinfatigue.lua"
+  ],
+
+  "label" : "Throwing the weapon gave you energy fatigue.",
+  "icon" : "talajavelinfatigue.png"
+}

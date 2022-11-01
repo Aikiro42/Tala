@@ -1,8 +1,9 @@
 {
     "input": [
-        {"item": "essence", "count": 100000}
+        {"item": "luzrelic", "count": 1},
+        {"item": "virelic", "count": 1},
+        {"item": "mindarelic", "count": 1}
     ],
     "output": {"item": "talaspear", "count": 1},
-    "groups" : [ "craftingmanipulator", "weapons", "all" ]
-
+    "groups" : [ "craftingmanipulator", "weapons", "all", "talablessing" ]
 }

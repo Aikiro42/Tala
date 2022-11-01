@@ -1,0 +1,16 @@
+{
+  "name" : "talarelicweakness",
+  "effectConfig" : {
+    "powerModifier": 0
+  },
+  "defaultDuration" : 5,
+
+  "scripts" : [
+    "talarelicweakness.lua"
+  ],
+
+  "animationConfig" : "/stats/effects/talarelic/talarelicstat.animation",
+  
+  "label" : "Through weakness...",
+  "icon" : "talarelicweakness.png"
+}

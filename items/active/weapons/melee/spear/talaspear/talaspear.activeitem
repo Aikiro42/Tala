@@ -18,7 +18,7 @@
   "animationParts" : {
     "handle" : "",
     "handleFullbright" : "",
-    "blade" : "talaspear.png"
+    "blade" : "talaspear2.png"
   },
   "animationCustom" : {
     "sounds" : {
@@ -31,6 +31,11 @@
   "scripts" : ["/items/active/weapons/melee/talaweapon.lua"],
 
   "activeTime" : 0.1,
+
+  // Chance to give you ancient essence when damaging enemies
+  "essenceChance": 0.2,
+  "minEssence": 1,
+  "maxEssence": 10,
 
   "elementalType" : "physical",
 

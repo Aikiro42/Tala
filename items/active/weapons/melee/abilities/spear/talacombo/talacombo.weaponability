@@ -47,6 +47,15 @@
             "cycle" : 0.1,
             "mode" : "transition",
             "transition" : "idle"
+          },
+          "fire8" : {
+            "mode" : "transition",
+            "properties" : {
+              "persistentSound" : "/sfx/melee/spear_twirl_loop.ogg"
+            },
+            "cycle" : 0.5,
+            "frames" : 1,
+            "transition" : "idle"
           }
         }}
       },
@@ -78,7 +87,8 @@
                   [2, -3.25]
               ],
               "image": "/items/active/weapons/melee/abilities/spear/talacombo/talaswoosh/horizontalslash.png:<frame>",
-              "offset": [-1.75, -1.25]
+              "offset": [-1.75, -1.25],
+              "fullbright" : true
             }
           },
           "fire2": {
@@ -101,7 +111,8 @@
                 [-2.5625, 2.1875]
               ],
               "image": "/items/active/weapons/melee/abilities/spear/talacombo/talaswoosh/verticalslash.png:<frame>",
-              "offset": [1, 2.5]
+              "offset": [1, 2.5],
+              "fullbright" : true
             }
           },
           "fire3" : {
@@ -109,13 +120,14 @@
               "image" : "/items/active/weapons/melee/abilities/spear/talacombo/talaswoosh/castlevaniaslash.png:<frame>",
               "offset" : [-2.75, -0.5],
               "damageArea" : [[6.875, -1.0625],
-              [-0.75, -1.0625],
-              [-5.25, -0.6875],
-              [-7.0, -0.0625],
-              [-1.5, 0.9375],
-              [1.0, 0.9375],
-              [-2.125, 0.0625]
-            ]
+                [-0.75, -1.0625],
+                [-5.25, -0.6875],
+                [-7.0, -0.0625],
+                [-1.5, 0.9375],
+                [1.0, 0.9375],
+                [-2.125, 0.0625]
+              ],
+              "fullbright" : true
             }
           },
           "fire4": {
@@ -133,7 +145,8 @@
                 [-2.5, -0.875]
               ],
               "image": "/items/active/weapons/melee/abilities/spear/talacombo/talaswoosh/underhandswoosh.png:<frame>",
-              "offset": [1, -1]
+              "offset": [1, -1],
+              "fullbright" : true
             }
           },
           "fire5": {
@@ -146,7 +159,8 @@
                 [-0.125, 0.6875]
               ],
               "image": "/items/active/weapons/melee/abilities/spear/talacombo/talaswoosh/stabswoosh.png:<frame>",
-              "offset": [3.5, 0]
+              "offset": [3.5, 0],
+              "fullbright" : true
             }
           },
           "fire6": {
@@ -159,7 +173,8 @@
                 [-0.125, 0.6875]
               ],
               "image": "/items/active/weapons/melee/abilities/spear/talacombo/talaswoosh/stabswoosh.png:<frame>",
-              "offset": [3.5, 0]
+              "offset": [3.5, 0],
+              "fullbright" : true
             }
           },
           "fire7": {
@@ -172,7 +187,27 @@
                 [-0.125, 0.6875]
               ],
               "image": "/items/active/weapons/melee/abilities/spear/talacombo/talaswoosh/stabswoosh.png:<frame>",
-              "offset": [3.5, 0]
+              "offset": [3.5, 0],
+              "fullbright" : true
+            }
+          },
+          "fire8" : {
+            "properties" : {
+              "offset" : [ 0, 0 ],
+              "damageArea" : [
+                [-5.75, -0.0],
+                [-5.75, -0.00],
+                [-4.07, -4.07],
+                [-0.00, -5.75],
+                [4.07, -4.07],
+                [5.75, -0.00],
+                [4.07, 4.07],
+                [0.00, 5.75],
+                [-4.07, 4.07]
+              ],
+              "image" : "/items/active/weapons/melee/abilities/spear/talacombo/talaswoosh/whirlswoosh.png",
+              //"image" : "/items/active/weapons/melee/abilities/spear/spin/spinswoosh.png?flipy",
+              "fullbright" : true
             }
           }
         }}}
@@ -188,7 +223,8 @@
       "fire4" : [ "/sfx/melee/laser_weapon_swing1.ogg", "/sfx/melee/laser_weapon_swing2.ogg", "/sfx/melee/laser_weapon_swing3.ogg" ],
       "fire5" : [ "/sfx/melee/laser_weapon_swing1.ogg", "/sfx/melee/laser_weapon_swing2.ogg", "/sfx/melee/laser_weapon_swing3.ogg" ],
       "fire6" : [ "/sfx/melee/laser_weapon_swing1.ogg", "/sfx/melee/laser_weapon_swing2.ogg", "/sfx/melee/laser_weapon_swing3.ogg" ],
-      "fire7" : [ "/sfx/melee/laser_weapon_swing1.ogg", "/sfx/melee/laser_weapon_swing2.ogg", "/sfx/melee/laser_weapon_swing3.ogg" ]
+      "fire7" : [ "/sfx/melee/laser_weapon_swing1.ogg", "/sfx/melee/laser_weapon_swing2.ogg", "/sfx/melee/laser_weapon_swing3.ogg" ],
+      "fire8" : [ "/sfx/melee/laser_weapon_swing1.ogg", "/sfx/melee/laser_weapon_swing2.ogg", "/sfx/melee/laser_weapon_swing3.ogg" ]
     }
   },
 
@@ -198,7 +234,7 @@
     "scripts" : ["/items/active/weapons/melee/abilities/spear/talacombo/talacombo.lua"],
     "class" : "TalaCombo",
 
-    "comboSteps" : 7,
+    "comboSteps" : 8,
 
     "flashTime" : 0.15,
     "flashDirectives" : "fade=FFFFFFFF=0.15",
@@ -210,8 +246,9 @@
       [0, 0, 0, 0],
       [0, 0, 0, 0],
       [0, 0, 0, 0],
+      [0, 0, 0, 0],
       [0, 0, 0, 0]
-  ],
+    ],
 
     // cooldown time multiplier for steps after the first, compounded per combo step
     "comboSpeedFactor" : 0.1,
@@ -219,8 +256,39 @@
     "edgeTriggerGrace" : 0.25,
 
     "fireTime" : 0.83,
-    "baseDps" : 7,
+    "baseDps" : 6,
 
+    
+    /*
+
+    If the user has 100% energy, walking and activating this ability will make the user throw this weapon.
+    
+    The projectile's damage is determined by the following factors:
+    1. The amount of max energy the wielder has.
+    2. The power multiplier of the wielder (i.e. their ATK stat)
+    3. The javelinDamageFactor of the ability. (This stat is present for balancing purposes)
+
+    These factors are multiplicative.
+    
+    */
+    "javelinDamageFactor": 0.3,
+
+
+    /*
+    Dodge Parameters: {
+      "cooldown": float; time it takes until you can dodge again.
+      "speed": float; your maintained speed during the duration of the dodge.
+      "triggerTime": float; period of time wherein if you release the walk button, you dodge if able.
+      "time": how long your speed is maintained (i.e. the duration of the dodge).
+
+      Note: The longer the time and the faster your speed, the farther you go when you dodge.
+
+      "endXVelMult": float; value multiplied to your x velocity by the end of the dodge.
+      This is so that, if you have a ludicrously high dodge speed, the inertia you get
+      by the end of the dodge is dampened (or negated if you set this value to 0).
+
+    }
+    */
     "dodgeParams": {
       "cooldown": 0.1,
       "speed": 100,
@@ -229,6 +297,7 @@
       "endXVelMult": 0.1
     },
 
+    // Amount of energy restored per damaging hit.
     "energyStealRate": 0.05,
 
     "damageConfig" : {
@@ -273,8 +342,16 @@
         "damageSourceKind" : "spear",
         "baseDamageFactor": 1.2,
         "knockback": 20
+      },
+      {
+        "damageSourceKind" : "axe",
+        "baseDamageFactor": 0.5,
+        "knockback": 15,
+        "timeout" : 0.1
       }
   ],
+
+
 
     "stances" : {
 
@@ -306,20 +383,10 @@
       "windup1": {
         "allowRotate": true,
         "allowFlip": true,
-        "twoHanded": true,
-        "weaponRotation": -220,
-        "armRotation": -45,
-        "weaponAngularVelocity": -1250,
-        "armAngularVelocity": 950,
-        "duration": 0.1
-      },
-      "preslash1":{
-          "allowRotate": true,
-          "allowFlip": true,
-          "twoHanded": true,
-          "weaponRotation": 15,
-          "armRotation": 50,
-          "duration": 0.05
+        "twoHanded": true,  
+        "weaponRotation": 15,
+        "armRotation": 50,
+        "duration": 0.05
       },
       "fire1":{
           "allowRotate": true,
@@ -327,8 +394,7 @@
           "twoHanded": true,
           "weaponRotation": -152.5,
           "armRotation": -120,
-          "duration": 0.1,
-          "cooldown": 0.05
+          "duration": 0.1
       },
       "wait1": {
           "allowRotate": false,
@@ -437,11 +503,12 @@
         "duration": 0.05
       },
       "fire4": {
+        "flipWeapon": true,
         "allowRotate": false,
         "allowFlip": false,
         "twoHanded": true,
         "weaponRotation": -90,
-        "armRotation": 0,
+        "armRotation": -15,
         "duration": 0.1
       },
       "wait4": {
@@ -450,7 +517,7 @@
           "allowFlip": true,
           "twoHanded": true,
           "weaponRotation": -90,
-          "armRotation": 0,
+          "armRotation": -15,
           "duration": 0.5
       },
 
@@ -461,7 +528,7 @@
         "allowFlip": true,
         "twoHanded": true,
         "weaponRotation": -90,
-        "armRotation": 0,
+        "armRotation": -15,
         "weaponAngularVelocity": 1800,
         "armAngularVelocity": -1800,
         "duration": 0.1
@@ -496,6 +563,7 @@
         "duration": 0.05
       },
       "fire6": {
+        "flipWeapon": true,
         "allowRotate": false,
         "allowFlip": false,
         "twoHanded": true,
@@ -504,6 +572,7 @@
         "duration": 0.05
       },
       "wait6": {
+        "flipWeapon": true,
         "allowRotate": false,
         "allowFlip": false,
         "twoHanded": true,
@@ -539,8 +608,42 @@
       "weaponRotation": -90,
       "armRotation": -10,
       "duration": 0.5
-    }
+    },
 
+    // Attack 8
+    // Credits to phase858's Violium Spear for the spinslash code
+    "windup8" : {
+      "flipWeapon": true,
+      "allowFlip" : true,
+      "allowRotate" : false,
+      "twoHanded" : true,
+      "weaponRotation": -90,
+      "armRotation": -10,
+      "armAngularVelocity": -50,
+      "weaponOffset" : [ 0, 0 ],
+      "duration" : 0.1
+    },
+    "fire8" : {
+      "flipWeapon": true,
+      "allowFlip" : true,
+      "allowRotate" : true,
+      "twoHanded" : true,
+      "weaponRotation" : -90,
+      "armRotation" : -15,
+      "weaponAngularVelocity" : 3130,
+      // "weaponAngularVelocity" : 105,
+      "armAngularVelocity": 65,
+      "weaponOffset" : [ 0, 0 ],
+      "duration" : 0.5
+    },
+    "wait8":{
+      "allowRotate": true,
+      "allowFlip": true,
+      "twoHanded": true,
+      "weaponRotation": 15,
+      "armRotation": 50,
+      "duration": 0.5
+    }
     }
   }
 }

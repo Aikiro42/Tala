@@ -9,6 +9,8 @@ local fireHeld = false
 local starListener
 local projectileStack = {}
 
+local passives = {}
+
 function TalaVisage:init()
 
   -- sb.logInfo("[TALA] randStarProperties = " .. sb.printJson(self.randStarProperties))
@@ -49,7 +51,8 @@ function TalaVisage:update(dt, fireMode, shiftHeld)
   starListener:update()
   activeItem.setScriptedAnimationParameter("starIndex", self.starIndex)
   activeItem.setScriptedAnimationParameter("starTable", self.starTable)
-  status.addEphemeralEffect("talapassive")
+  
+  status.addEphemeralEffects(passives)
   
   -- update projectile stack
   for i, projectile in ipairs(projectileStack) do
@@ -79,10 +82,10 @@ function TalaVisage:update(dt, fireMode, shiftHeld)
   --]]
 
   -- lifesaver
-  if status.resourcePercentage("health") <= 0.2 and #self.starTable > 0 then
+  if status.resourcePercentage("health") <= self.saverollTriggerPercent and #self.starTable >= (self.saverollStars or 1) then
     animator.playSound("saveroll")
     status.setResourcePercentage("health", 1)
-    status.addEphemeralEffect("talaphase")
+    status.addEphemeralEffect("talaphase", self.saverollTime)
     self.starTable = {}
     self.starIndex = 1
   end
@@ -130,14 +133,21 @@ function TalaVisage:fire()
 
   fireHeld = true
 
+  animator.playSound("starbreak")
   -- hide the sprite
   self.starTable[self.starIndex].sprite = "/assetmissing.png"
 
   -- fire the star
-  if self.starTable[self.starIndex].projectileType ~= "hitscan" then
-    self:fireProjectiles()
-  else
-    self:fireHitscan()
+  if self.starTable[self.starIndex].projectileType then
+    if self.starTable[self.starIndex].projectileType ~= "hitscan" then
+      self:fireProjectiles()
+    else
+      self:fireHitscan()
+    end
+  end
+
+  if self.starTable[self.starIndex].selfStatFx then
+    status.addEphemeralEffects(self.starTable[self.starIndex].selfStatFx)
   end
 
   -- remove star from startable
@@ -154,7 +164,7 @@ function TalaVisage:fireProjectiles()
   -- sb.logInfo("[TALA] " .. sb.printJson(self.starTable))
   local shots = self.starTable[self.starIndex].burstCount
   local params = copy(self.starTable[self.starIndex].projectileParams)
-  params.power = self:damageAmount()
+  params.power = self:damageAmount(shots)
   local soundPlayed = false
   while shots > 0 do
 
@@ -178,7 +188,7 @@ function TalaVisage:fireProjectiles()
       soundPlayed = true
     end
 
-    self:screenShake(0.2, 0.01)
+    self:screenShake(0.1, 0.01)
 
     if shots > 0 then util.wait(self.starTable[self.starIndex].burstTime) end
 
@@ -218,7 +228,7 @@ function TalaVisage:fireHitscan()
       soundPlayed = true
     end
 
-    self:screenShake(0.2, 0.01)
+    self:screenShake(0.1, 0.01)
 
     if shots > 0 then util.wait(self.starTable[self.starIndex].burstTime) end
 
@@ -273,16 +283,19 @@ end
 --[[
 
 Damage is calculated depending on:
-1. amount of Ancient Essence the wielder has divided by 10000. Holding over 100,000 AE won't give additional damage.
-2. weapon tier
-3. how close the stars are to max orbit speed times the number of stars accumulated
-4. the owner's ATK stat
+1. amount of Ancient Essence the wielder has divided by 1000. Holding over 10,000 AE won't give additional damage.
+2. how close the stars are to max orbit speed times the number of stars accumulated
+3. the owner's ATK stat
 
 All factors are multiplicative to each other.
 
 --]]
-function TalaVisage:damageAmount()
-  return math.min(10, ((world.entityCurrency(activeItem.ownerEntityId(), "essence") or 1)/10000)) * config.getParameter("damageLevelMultiplier") * (1 + self:orbitRatio() * #self.starTable) * activeItem.ownerPowerMultiplier()
+function TalaVisage:damageAmount(burstCount)
+  return math.min(self.maxStarBaseDamage, ((world.entityCurrency(activeItem.ownerEntityId(), "essence") or (self.essenceBaseDamageDiv * self.maxStarBaseDamage / 2))/self.essenceBaseDamageDiv))
+   * (1 + self:orbitRatio()) 
+   * #self.starTable
+   * activeItem.ownerPowerMultiplier()
+   / (burstCount or 1)
 end
 
 function TalaVisage:orbitRatio()
@@ -290,7 +303,9 @@ function TalaVisage:orbitRatio()
 end
 
 function TalaVisage:uninit()
-  status.removeEphemeralEffect("talapassive")
+  for _,passive in ipairs(passives)do
+    status.removeEphemeralEffect(passive)
+  end
 end
 
 function TalaVisage:updateStarPos()
@@ -329,7 +344,7 @@ function TalaVisage:addStar()
     table.remove(self.starTable, 1)
   end
 
-  local type = math.random(1, #self.randStarProperties)
+  local type = self.DEBUG and self.STARINDEXBIAS or math.random(1, #self.randStarProperties)
   --[[
     Each item in the starTable contains the following:
     - sprite path

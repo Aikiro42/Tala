@@ -1,0 +1,17 @@
+{
+  "name" : "talarelicagility",
+  "effectConfig" : {
+    "runboost": 2,
+    "jumpboost": 1.25
+  },
+  "defaultDuration" : 10,
+
+  "scripts" : [
+    "talarelicagility.lua"
+  ],
+
+  "animationConfig" : "/stats/effects/talarelic/talarelicstat.animation",
+
+  "label" : "The journey of a thousand miles...",
+  "icon" : "talarelicagility.png"
+}

@@ -1,0 +1,18 @@
+{
+  "itemName" : "mindarelic",
+  "price" : 1616,
+  "rarity" : "Legendary",
+  "category" : "upgradeComponent",
+  "inventoryIcon" : "mindarelic.png",
+  "description" : "A fragile star shard that could fetch a high price. Maybe what's in it would cost more than the shard itself...",
+  "shortdescription" : "Star Shard of Minda",
+  "maxStack" : 99,
+  "effects" : [ [
+    "talarelicavarice"
+  ] ],
+  "blockingEffects" : [
+    "talarelicavarice"
+  ],
+  "emote" : "",
+  "emitters" : []
+}

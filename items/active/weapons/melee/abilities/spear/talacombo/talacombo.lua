@@ -20,7 +20,7 @@ function TalaCombo:init()
 
   self:computeDamageAndCooldowns()
 
-  self.weapon:setStance(self.stances.idle)
+  self:setStance(self.stances.idle)
 
   self.edgeTriggerTimer = 0
   self.flashTimer = 0
@@ -44,7 +44,7 @@ function TalaCombo:init()
   end)
 
   self.weapon.onLeaveAbility = function()
-    -- self.weapon:setStance(self.stances.idle)
+    -- self:setStance(self.stances.idle)
     thrown = false
   end
 
@@ -68,8 +68,9 @@ function TalaCombo:update(dt, fireMode, shiftHeld)
   -- activation logic
 
   -- controls whether you're holding the item or not
-  if animator.animationState("blade") == "inactive" and not thrown then
+  if animator.animationState("blade") == "inactive" and not thrown and self.activeTimer == 0 then
     activeItem.setHoldingItem(false)
+    self:setStance(self.stances.idle)
   else
     activeItem.setHoldingItem(true)
   end
@@ -126,7 +127,7 @@ function TalaCombo:update(dt, fireMode, shiftHeld)
   -- actual activation
   if not self.weapon.currentAbility and self:shouldActivate() then
       self.activeTimer = self.activeTime
-      if shiftHeld and status.resourcePercentage("energy") == 1then
+      if shiftHeld and status.resourcePercentage("energy") == 1 then
         self:setState(self.javelinCharge)
       else
         self:setState(self.windup)
@@ -157,14 +158,16 @@ end
 
 function TalaCombo:javelinCharge()
   -- lerp
-  -- self.weapon:setStance(self.stances.javelinCharge)
-  status.setResourcePercentage("energy", 0)
+  -- self:setStance(self.stances.javelinCharge)
+  status.overConsumeResource("energy", status.resourceMax("energy"))
+  activeItem.setTwoHandedGrip(false)
   local chargeTimer = 0
   local maxChargeTime = self.stances.javelinCharge.duration
   while self.fireMode == self.activatingFireMode or self.abilitySlot do
     local chargeProgress = chargeTimer / maxChargeTime
     self.weapon:updateAim()
-
+    
+    self.weapon.aimAngle, self.weapon.aimDirection = activeItem.aimAngleAndDirection(0, activeItem.ownerAimPosition())
     self.weapon.relativeWeaponRotation = util.toRadians(interp.sin(chargeProgress, math.deg(self.weapon.relativeWeaponRotation), self.stances.javelinCharge.weaponRotation))
     self.weapon.relativeArmRotation = util.toRadians(interp.sin(chargeProgress, math.deg(self.weapon.relativeArmRotation), self.stances.javelinCharge.armRotation))
 
@@ -182,7 +185,7 @@ function TalaCombo:javelinFire()
 
   local projOrigin = vec2.add(mcontroller.position(), activeItem.handPosition())
 
-  self.weapon:setStance(self.stances.javelinFire)
+  self:setStance(self.stances.javelinFire)
   self.weapon:updateAim()
   animator.setAnimationState("blade", "inactive")
   
@@ -193,28 +196,30 @@ function TalaCombo:javelinFire()
     world.distance(activeItem.ownerAimPosition(), projOrigin),
     false,
     {
-      power = status.resourceMax("energy"),
-      damageType = "IgnoresDef",
+      power = self:getJavelinDamage(),
     }
   )
 
+  status.addEphemeralEffect("talajavelinfatigue")
   util.wait(self.stances.javelinFire.duration)
-  self.weapon:setStance(self.stances.idle)
+  self:setStance(self.stances.idle)
   self.activeTimer = 0
   self.comboStep = 1
   
 end
 
 function TalaCombo:getJavelinDamage()
-  return status.resourceMax("energy") * activeItem.ownerPowerMultiplier() * config.getParameter("level", 1) * config.getParameter("damageLevelMultiplier", 1)
+  return status.resourceMax("energy")
+  * activeItem.ownerPowerMultiplier()
+  * self.javelinDamageFactor
 end
 
 
 -- State: windup
 function TalaCombo:windup()
   local stance = self.stances["windup"..self.comboStep]
-
-  self.weapon:setStance(stance)
+  activeItem.setHoldingItem(true)
+  self:setStance(stance)
 
   self.edgeTriggerTimer = 0
 
@@ -242,7 +247,7 @@ end
 function TalaCombo:preslash()
   local stance = self.stances["preslash"..self.comboStep]
 
-  self.weapon:setStance(stance)
+  self:setStance(stance)
   self.weapon:updateAim()
 
   util.wait(stance.duration)
@@ -254,7 +259,7 @@ end
 function TalaCombo:fire()
   local stance = self.stances["fire"..self.comboStep]
 
-  self.weapon:setStance(stance)
+  self:setStance(stance)
   self.weapon:updateAim()
 
   local animStateKey = self.animKeyPrefix .. (self.comboStep > 1 and "fire"..self.comboStep or "fire")
@@ -284,8 +289,8 @@ end
 -- waiting for next combo input
 function TalaCombo:wait()
   local stance = self.stances["wait"..(self.comboStep)]
-  stance.allowFlip = true
-  self.weapon:setStance(stance)
+  -- stance.allowFlip = true
+  self:setStance(stance)
 
   util.wait(stance.duration, function()
 
@@ -301,7 +306,7 @@ function TalaCombo:wait()
       if not isShiftHeld then
         self.comboStep = (self.comboStep % self.comboSteps) + 1
         self:setState(self.windup)
-      else
+      elseif status.resourcePercentage("energy") == 1 then
         self:setState(self.javelinCharge)
       end
       return
@@ -378,4 +383,13 @@ function TalaCombo:screenShake(amount, shakeTime)
     }
   )
   activeItem.setCameraFocusEntity(cam)
+end
+
+function TalaCombo:setStance(stance)
+  self.weapon:setStance(stance)
+  if stance.flipWeapon then
+    animator.setGlobalTag("directives", "?flipx")
+  else
+    animator.setGlobalTag("directives", "")
+  end
 end

@@ -1,0 +1,64 @@
+{
+  "objectName" : "talaaltar",
+  "colonyTags" : ["crafting"],
+  "category" : "crafting",
+  "rarity" : "Legendary",
+  "description" : "An Altar to Tala, Goddess of the Stars.",
+  "shortdescription" : "^#FF88FF;Celestial Altar^white;",
+  "race" : "generic",
+  "interactAction" : "OpenCraftingInterface",
+  "interactData" : {
+    "config" : "/objects/crafting/talaaltar/interface/talaaltar.config",
+    "paneLayoutOverride" : {
+      "windowtitle" : {
+        "title" : "^##FF88FF;Celestial Altar^white;",
+        "subtitle" : " ^#b9b5b2;Tala's Blessings",
+        "icon" : {
+          "file" : "/objects/crafting/talaaltar/interface/talacrafticon.png"
+        }
+      }
+    },
+    "filter" : [ "talablessing" ]
+  },
+  "printable" : false,
+  "price" : 42069,
+
+  "apexDescription" : "This altar holds an extraordinary amount of energy... how could we harness it?",
+  "avianDescription" : "An altar to Tala! If only we have star shards to offer...",
+  "floranDescription" : "Big weeird sssstone thingyy with sssstar?",
+  "glitchDescription" : "Intrigued. An altar of sorts... It seems familiar.",
+  "humanDescription" : "An altar...? The magenta glow is mesmerizing.",
+  "hylotlDescription" : "An altar to Tala, Goddess of the Stars.",
+  "novakidDescription" : "I dunno... this thing here gives me somethin' like a momma's comfort...",
+
+  "inventoryIcon" : "talaaltaricon.png",
+
+  "lightColor" : [64, 0, 64],
+
+  "flickerPeriod" : 0.9,
+  "flickerMinIntensity" : 0.5,
+  "flickerMaxIntensity" : 1,
+  "flickerPeriodVariance" : 0.0,
+  "flickerIntensityVariance" : 0.1,
+
+  "orientations" : [
+    {
+      "imageLayers" : [
+        { "image" : "talaaltar.png:<color>.<frame>" },
+        { "image" : "talaaltarfullbright.png:<color>.<frame>", "fullbright" : true  }
+      ],
+      "imagePosition" : [-24, 0],
+
+      "frames" : 9,
+      "animationCycle" : 0.9,
+
+      "spaceScan" : 0.1,
+      "anchors" : [ "bottom" ],
+
+      "collision" : "platform",
+      "collisionSpaces" : [ [-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0], [3, 0] ]
+    }
+  ],
+
+  "npcToy" : {}
+}

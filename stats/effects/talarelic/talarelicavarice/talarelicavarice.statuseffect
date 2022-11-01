@@ -1,0 +1,14 @@
+{
+  "name" : "talarelicavarice",
+  "effectConfig" : {
+    "dice": 20,
+    "winAmount": 12345
+  },
+  "defaultDuration" : 1,
+
+  "scripts" : [
+    "talarelicavarice.lua"
+  ],
+
+  "animationConfig" : "/stats/effects/talarelic/talarelicstat.animation"
+}

@@ -1,0 +1,19 @@
+{
+  "itemName" : "luzrelic",
+  "price" : 1616,
+  "rarity" : "Legendary",
+  "category" : "upgradeComponent",
+  "inventoryIcon" : "luzrelic.png",
+  "description" : "A fragile star shard humming with power. Crushing it could release the strength held within...",
+  "shortdescription" : "Star Shard of Luz",
+  "maxStack" : 99,
+  "effects" : [ [
+    "talarelicweakness"
+  ] ],
+  "blockingEffects" : [
+    "talarelicstrength",
+    "talarelicweakness"
+  ],
+  "emote" : "",
+  "emitters" : []
+}

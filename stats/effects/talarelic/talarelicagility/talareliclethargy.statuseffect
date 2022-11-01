@@ -1,0 +1,15 @@
+{
+  "name" : "talareliclethargy",
+  "effectConfig" : {
+    "runboost": 0.1,
+    "jumpboost": 0.1
+  },
+  "defaultDuration" : 10,
+
+  "scripts" : [
+    "talareliclethargy.lua"
+  ],
+
+  "label" : "...begins with a single step.",
+  "icon" : "talareliclethargy.png"
+}

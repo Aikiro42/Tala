@@ -1,0 +1,14 @@
+{
+  "name" : "talarelicstrength",
+  "effectConfig" : {
+    "powerModifier": 5
+  },
+  "defaultDuration" : 5,
+
+  "scripts" : [
+    "talarelicstrength.lua"
+  ],
+
+  "label" : "...comes strength.",
+  "icon" : "talarelicstrength.png"
+}

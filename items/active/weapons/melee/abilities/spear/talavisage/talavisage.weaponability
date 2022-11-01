@@ -2,6 +2,7 @@
   "animationParts" : { },
   "animationCustom" : {
     "sounds" : {
+      "starbreak": ["/sfx/objects/essencechest_open2.ogg"],
       "fireStar" : [ "/sfx/gun/plasma_pistol1.ogg" ],
       "starscream": ["/sfx/tala/starscream.ogg"],
       "switchstar": ["/sfx/objects/ancientenergy_chord.ogg"],
@@ -14,24 +15,80 @@
 	],
 
   "ability" : {
+
+    // "DEBUG": true,
+    // "STARINDEXBIAS": 1,
+
     "name" : "Tala's Visage",
     "type" : "talavisage",
     "scripts" : ["/items/active/weapons/melee/abilities/spear/talavisage/talavisage.lua"],
     "class" : "TalaVisage",
 
+    // Starting position of the first star based on the player's position.
     "starOffset": [2, -0.5],
-    // "starOffset": [3, 3],
+
     "minOrbitSpeed": 5,
     "maxOrbitSpeed": 25,
     "orbitAccel": 5,
 
     "maxStars": 6,
 
+    /*
+    
+    Star damage is calculated based on the following factors:
+
+    1. amount of Ancient Essence the wielder has divided by essenceBaseDamageDiv.
+    2. how close the stars are to max orbit speed,
+    3. the number of stars accumulated
+    4. the owner's power multiplier (ATK stat)
+
+    These factors are multiplied to each other, and the product is the total damage of the star.
+    Divide the product by the number of shots the star shoots, and you have the damage per projectile.
+
+    */
+    "maxStarBaseDamage": 10,
+    "essenceBaseDamageDiv": 1000,
+
     "chargeTime": 1,
 
-    "hitsPerStar": 5, // damage needed to be dealt to earn one star, divided by half the tier of the weapon
+    "hitsPerStar": 5, // damaging hits needed to be dealt to earn one star
 
+    /*
+    
+    If the wielder's health drops below <saverollTriggerPercent> and the player has at least <saverollStars>,
+    all health is restored and all stars are expended without shooting them.
+    The wielder is also made invincible for <saverollTime> seconds.
+
+    */
+    "saverollTriggerPercent": 0.2,
+    "saverollTime": 1.5,
+    "saverollStars": 3,
+
+    // List of possible stars the wielder can possibly get.
     "randStarProperties": [
+      /*
+      
+      {
+        "sprite": absolute path to the rendered image that will orbit the player
+        "lightColor": RGB array of the point light of the star. (Stars emit light, duh)
+        "burstCount": Number of projectiles/hitscans the star shoots.
+        "burstTime": If burstTime is 0 and burstCount > 1, the star shoots like a shotgun. It shoots burst-fire otherwise.
+        "inaccuracy": The amount of inaccuracy the shot has.
+        "projectileType": Name of the projectile launched when shooting the star. If set to "hitscan" then the star will make a hitscan shot.
+        "projectileParams": Parameters of the projectile if it isn't a hitscan. Power is irrelevant; see above for star damage calculation.
+      }
+
+      */
+      {
+        "sprite": "/items/active/weapons/melee/abilities/spear/talavisage/puti.png",
+        "lightColor": [100, 100, 100],
+        "burstCount": 1,
+        "burstTime": 0,
+        "projectileType": "putiproj",
+        "projectileParams": {
+          "damageType": "IgnoresDef"
+        }
+      },
       {
         "sprite": "/items/active/weapons/melee/abilities/spear/talavisage/luz.png",
         "lightColor": [125, 0, 0],
@@ -65,11 +122,19 @@
           "speed": 200,
           "damageType": "IgnoresDef"
         }
+      },
+      {
+        "sprite": "/items/active/weapons/melee/abilities/spear/talavisage/tera.png",
+        "lightColor": [103, 100, 68],
+        "selfStatFx": [
+          {"effect": "talaheal", "duration": 5}
+        ]
       }
     ],
 
     "cooldownTime" : 0.1,
 
+    // useless
     "stances" : {
       "charge" : {
         "duration" : 0.2,

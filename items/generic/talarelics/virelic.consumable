@@ -1,0 +1,19 @@
+{
+  "itemName" : "virelic",
+  "price" : 1616,
+  "rarity" : "Legendary",
+  "category" : "upgradeComponent",
+  "inventoryIcon" : "virelic.png",
+  "description" : "A fragile star shard that's lighter than it looks. Breaking it could release the winds storming within...",
+  "shortdescription" : "Star Shard of Vi",
+  "maxStack" : 99,
+  "effects" : [ [
+    "talarelicagility"
+  ] ],
+  "blockingEffects" : [
+    "talarelicagility",
+    "talareliclethargy"
+  ],
+  "emote" : "",
+  "emitters" : []
+}
