@@ -1,0 +1,14 @@
+{
+  "name" : "talaheal",
+  "effectConfig" : {},
+  "defaultDuration" : 5,
+
+  "scripts" : [
+    "talaheal.lua"
+  ],
+
+  "animationConfig" : "talaheal.animation",
+
+  "label" : "Party Time!",
+  "icon" : "/interface/statuses/levitate.png"
+}

@@ -8,7 +8,38 @@
       "switchstar": ["/sfx/objects/ancientenergy_chord.ogg"],
       "saveroll": ["/sfx/cinematics/teleporting_start.ogg"],
       "earnstar": ["/sfx/gun/gnomebeam_hit3.ogg"]
+    },
+
+    "particleEmitters" : {
+      "starbreak" : {
+        "enabled" : false,
+        "emissionRate" : 10.0,
+        "particles" : [
+          {
+            "particle" : {
+              "type" : "ember",
+              "size" : 1.0,
+              "color" : [255, 255, 255, 255],
+              "fullbright": true,
+              "destructionAction" : "shrink",
+              "destructionTime" : 0.3,
+              "fade" : 0.9,
+              "position" : [0.0, 0.0],
+              "offsetRegion" : [0, 0, 0, 0],
+              "initialVelocity" : [-6.0, 6.0],
+              "finalVelocity" : [0, -6.0],
+              "approach" : [0, 20],
+              "timeToLive" : 0.3,
+              "variance" : {
+                "size" : 0.5,
+                "initialVelocity" : [10.0, 10.0]
+              }
+            }
+          }
+        ]
+      }
     }
+
   },
   "animationScripts" : [
 		"/items/active/weapons/melee/abilities/spear/talavisage/talavisageanimation.lua"
@@ -127,7 +158,7 @@
         "sprite": "/items/active/weapons/melee/abilities/spear/talavisage/tera.png",
         "lightColor": [103, 100, 68],
         "selfStatFx": [
-          {"effect": "talaheal", "duration": 5}
+          {"effect": "talaenergize", "duration": 5}
         ]
       }
     ],

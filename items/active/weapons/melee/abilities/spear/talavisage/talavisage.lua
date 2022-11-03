@@ -129,13 +129,24 @@ function TalaVisage:charge()
   self:setState(self.fire)
 end
 
+function makeBoundBox(center, radius)
+  return {center[1]-radius, center[2]-radius, center[1]+radius, center[2]+radius }
+end
+
 function TalaVisage:fire()
 
   fireHeld = true
 
   animator.playSound("starbreak")
+
   -- hide the sprite
   self.starTable[self.starIndex].sprite = "/assetmissing.png"
+
+  
+  -- burst particle emitter
+  animator.setParticleEmitterOffsetRegion("starbreak", makeBoundBox(self.starTable[self.starIndex].position, 10))
+  animator.setParticleEmitterBurstCount("starbreak", 50)
+  animator.burstParticleEmitter("starbreak")
 
   -- fire the star
   if self.starTable[self.starIndex].projectileType then

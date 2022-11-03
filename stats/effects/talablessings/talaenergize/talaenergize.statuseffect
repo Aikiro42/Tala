@@ -1,0 +1,20 @@
+{
+  "name" : "talaenergize",
+  "blockingStat" : "",
+
+  "effectConfig" : {
+
+  },
+  "defaultDuration" : 5,
+
+  "scripts" : [
+    "talaenergize.lua"
+  ],
+
+  // Heal energy every second
+  "label" : "Tera's Blessing: Infinite Energy",
+
+  "animationConfig" : "talaenergize.animation",
+
+  "icon" : "talaenergize.png"
+}
